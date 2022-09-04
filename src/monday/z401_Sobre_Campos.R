@@ -21,7 +21,7 @@ require("dplyr")
 # Poner la carpeta de la materia de SU computadora local
 setwd("/dmef")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(100057, 300007, 500009, 600011, 700001)
 
 # Cargamos el dataset
 dataset <- fread("./datasets/competencia1_2022.csv")
