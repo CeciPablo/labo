@@ -1125,3 +1125,76 @@ run  <- mbo( fun=     obj.fun,
 tb_resultados  <- as.data.table( run$opt.path )
 tb_resultados
 tb_resultados[ which.max( tb_resultados$y ) ]
+
+################################################################################
+###########Sobre_Cocinar_Pizzas
+
+# Limpiamos el entorno
+rm(list = ls())
+gc(verbose = FALSE)
+
+# Librerías necesarias
+require("data.table")
+require("rpart")
+require("ROCR")
+require("ggplot2")
+require("lubridate")
+require("lhs")
+require("DiceKriging")
+require("mlrMBO")
+
+# Poner la carpeta de la materia de SU computadora local
+setwd("/dmef")
+# Poner sus semillas
+semillas <- c(100057, 300007, 500009, 600011, 700001)
+
+# Cargamos el dataset
+dataset <- fread("./datasets/competencia1_2022.csv")
+
+# Nos quedamos solo con el 202101
+dataset <- dataset[foto_mes == 202101]
+
+# Creamos una clase binaria
+dataset[, clase_binaria := ifelse(
+  clase_ternaria == "BAJA+2",
+  "evento",
+  "noevento"
+)]
+
+# Borramos el target viejo
+dataset[, clase_ternaria := NULL]
+
+
+# Seteamos nuestra primera semilla
+set.seed(semillas[1])
+
+# Particionamos de forma estratificada
+in_training <- caret::createDataPartition(dataset$clase_binaria,
+                                          p = 0.70, list = FALSE)
+dtrain  <-  dataset[in_training, ]
+dtest   <-  dataset[-in_training, ]
+
+# Calculamos cuanto tarda un modelo "promedio" entrenar.
+start_time <- Sys.time()
+modelo <- rpart(clase_binaria ~ .,
+                data = dtrain,
+                xval = 0,
+                cp = 0,
+                minsplit = 20,
+                minbucket = 10,
+                maxdepth = 10)
+pred_testing <- predict(modelo, dtest, type = "prob")
+end_time <- Sys.time()
+model_time <- end_time - start_time
+print("Tiempo de ajuste en train y predict en test")
+print(model_time)
+
+ganancia <- function(probabilidades, clase) {
+  return(sum(
+    (probabilidades >= 0.025) * ifelse(clase == "evento", 78000, -2000))
+  )
+}
+
+print("La ganancia NORMALIZADA de nuestro modelo es:")
+print(ganancia(pred_testing[, "evento"], dtest$clase_binaria) / 0.3)
+
