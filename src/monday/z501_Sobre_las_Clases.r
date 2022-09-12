@@ -21,7 +21,7 @@ require("treeClust")
 require("ggplot2")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/dmef")
+setwd("/home/aleb/dmeyf2022")
 # Poner sus semillas
 semillas <- c(17, 19, 23, 29, 31)
 
@@ -110,9 +110,6 @@ print(sum(
 ## Preguntas
 ## ¿Obtuvo una importante mejora en su modelo?
 ## ¿Qué detalle fue creado con la clase BAJA+2 en mente que ya no aplica?
-
-# PCX: Cuando se suman clases, se rompe la proporción. El cambio del rebalanceo de clases
-# afecta el punto de corte.
 
 ## ---------------------------
 ## Step 4: De árboles a tablas, la venganza
