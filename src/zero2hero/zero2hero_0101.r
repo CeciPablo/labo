@@ -1155,11 +1155,18 @@ dataset <- fread("./datasets/competencia1_2022.csv")
 dataset <- dataset[foto_mes == 202101]
 
 # Creamos una clase binaria
+          #dataset[, clase_binaria := ifelse(
+          #  clase_ternaria == "BAJA+2",
+          #  "evento",
+          #  "noevento"
+          #)]
 dataset[, clase_binaria := ifelse(
-  clase_ternaria == "BAJA+2",
+  (clase_ternaria == "BAJA+2"|clase_ternaria == "BAJA+1"),
   "evento",
   "noevento"
 )]
+
+
 
 # Borramos el target viejo
 dataset[, clase_ternaria := NULL]
@@ -1197,4 +1204,513 @@ ganancia <- function(probabilidades, clase) {
 
 print("La ganancia NORMALIZADA de nuestro modelo es:")
 print(ganancia(pred_testing[, "evento"], dtest$clase_binaria) / 0.3)
+
+
+# Supongamos que sólo vamos a buscar sobre los parámetros *maxdepth* y # *minsplit*
+
+  # Tamaño del espacio de búsqueda de *maxdepth*
+n_md <- 30 - 4
+  
+  # Tamaño del espacio de búsqueda de *minsplit*
+n_ms <- 200 - 2
+
+  # Cantidad de semillas
+n_seeds <- 5
+
+# Estimación de cuanto tardaría en buscar el mejor modelo con 2 parámetros.
+print(seconds_to_period(n_md * n_ms * n_seeds * model_time))
+
+  #Tardaría: "3d 4H 21M 19.697413444519S"
+
+
+# Tamaño del espacio de búsqueda de *minsplit*
+n_mb <- 100 - 2
+
+# Estimación de cuanto tardaría en buscar el mejor modelo con 3 parámetros.
+print(seconds_to_period(n_md * n_ms * n_seeds * model_time * n_mb))
+  
+  #Tardaría: "311d 18H 50M 10.3465175628662S"
+
+
+## Step 4: Empezando a probar con menos casos
+
+set.seed(semillas[1])
+dist_uni <- matrix(runif(20), 10, 2)
+
+# LHS Latin hypercube sampling
+set.seed(semillas[1])
+dist_lhs <- optimumLHS(10, 2)
+
+par(mfrow = c(1, 2))
+plot(dist_uni)
+plot(dist_lhs)
+
+## Step 5: Tomando una muestra de sangre
+# Armamos una función para modelar con el fin de simplificar el código futuro
+#modelo_rpart <- function(train, test, cp =  -1, ms = 20, mb = 1, md = 10) {
+modelo_rpart <- function(train, test, cp =  -1, ms, mb, md) {
+  modelo <- rpart(clase_binaria ~ ., data = train,
+                  xval = 0,
+                  cp = cp,
+                  minsplit = ms,
+                  minbucket = mb,
+                  maxdepth = md)
+  
+  test_prediccion <- predict(modelo, test, type = "prob")
+  roc_pred <-  ROCR::prediction(test_prediccion[, "evento"],
+                                test$clase_binaria,
+                                label.ordering = c("noevento", "evento"))
+  auc_t <-  ROCR::performance(roc_pred, "auc")
+  
+  unlist(auc_t@y.values)
+}
+
+# Función para tomar un muestra dejando todos los elementos de la clase BAJA+2
+tomar_muestra <- function(datos, resto = 10000) {
+  t <- datos$clase_binaria == "evento"
+  r <- rep(FALSE, length(datos$clase_binaria))
+  r[!t][sample.int(resto, n = (length(t) - sum(t)))] <- TRUE
+  t | r
+}
+
+set.seed(semillas[1])
+ds_sample <- tomar_muestra(dataset)
+table(dataset[ds_sample]$clase_binaria)
+
+## Step 6: Comparando tiempos con o sin muestras
+
+t0 <- Sys.time()
+r1 <- modelo_rpart(dtrain, dtest)
+t1 <- Sys.time()
+print("Train entero")
+print(t1 - t0)
+print(r1)
+
+set.seed(semillas[1])
+dtrain_sample <- tomar_muestra(dtrain)
+
+t0 <- Sys.time()
+r2 <- modelo_rpart(dtrain[dtrain_sample, ], dtest)
+t1 <- Sys.time()
+print("Muestra train")
+print(t1 - t0)
+print(r2)
+
+
+## Step 7: Buscando el mejor modelo con muestras aleatorias LHS
+
+# Una función auxiliar para los experimentos
+#experimento_rpart <- function(ds, semillas, cp = -1, ms = 20, mb = 1, md = 10) {
+experimento_rpart <- function(ds, semillas, cp = -1, ms, mb, md) {
+  auc <- c()
+  for (s in semillas) {
+    set.seed(s)
+    in_training <- caret::createDataPartition(ds$clase_binaria, p = 0.70,
+                                              list = FALSE)
+    train  <-  ds[in_training, ]
+    test   <-  ds[-in_training, ]
+    train_sample <- tomar_muestra(train)
+    r <- modelo_rpart(train[train_sample,], test, 
+                      cp = cp, ms = ms, mb = mb, md = md)
+    auc <- c(auc, r)
+  }
+  mean(auc)
+}
+
+
+# Haremos 25 experimentos aleatorios, armamos las muestras de acuerdo a como
+# son las entradas de nuestro experimento.
+
+set.seed(semillas[1])
+cantidad_puntos <- 25
+espacio_busqueda_1 <- optimumLHS(cantidad_puntos, 2)
+
+# la primera columna es para el maxdepth, y la segunda para el minslip
+espacio_busqueda_1[, 1] <- floor(15 * espacio_busqueda_1[, 1]) + 4
+espacio_busqueda_1[, 2] <- floor(200 * espacio_busqueda_1[, 2]) + 2
+
+resultados_random_search <- data.table()
+for (e in 1:cantidad_puntos) {
+  r <- experimento_rpart(dataset, semillas,
+                         ms = espacio_busqueda_1[e, 2],
+                         md = espacio_busqueda_1[e, 1])
+  resultados_random_search <- rbindlist(list(resultados_random_search,
+                                             data.table(
+                                               md = espacio_busqueda_1[e, 1],
+                                               ms = espacio_busqueda_1[e, 2],
+                                               auc = r)
+  ))
+}
+
+print(resultados_random_search)
+ggplot(resultados_random_search, aes(x = md, y = ms, color = auc)) +
+  scale_color_gradient(low = "blue", high = "red") +
+  geom_point(aes(size = auc))
+
+## Step 8: Trabajando con herramientas más profesionales
+
+
+# Veamos un ejemplo
+set.seed(semillas[1])
+obj_fun <- makeSingleObjectiveFunction(
+  name = "Sine",
+  fn = function(x) sin(x),
+  par.set = makeNumericParamSet(lower = 3, upper = 13, len = 1)
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 10L)
+ctrl <- setMBOControlInfill(ctrl, crit = makeMBOInfillCritEI(),
+                            opt = "focussearch")
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+design <- generateDesign(6L, getParamSet(obj_fun), fun = lhs::maximinLHS)
+
+install.packages("rgenoud")
+require("rgenoud")
+
+run <- exampleRun(obj_fun, design = design, learner = lrn,
+                  control = ctrl, points.per.dim = 100, show.info = TRUE)
+
+# Ejecutar de a uno
+plotExampleRun(run, iters = 1, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 2, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 3, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 5, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 6, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 7, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 8, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 9, densregion = TRUE, pause = FALSE)
+plotExampleRun(run, iters = 10, densregion = TRUE, pause = FALSE)
+
+## ---------------------------
+
+
+## Step 9: Introduciendo la técnica en nuestro conjunto
+
+resultados_maxdepth <- data.table()
+
+for (v in 4:20) {
+  r <- data.table(
+    md = v,
+    auc = experimento_rpart(dataset, semillas, md = v)
+  )
+  resultados_maxdepth <- rbindlist(list(resultados_maxdepth, r))
+}
+
+ggplot(resultados_maxdepth, aes(md, auc)) + geom_point()
+
+## Step 9: Buscando con una Opt. Bayesiana para 1 parámetro
+## ---------------------------
+
+set.seed(semillas[1])
+obj_fun_md <- function(x) {
+  experimento_rpart(dataset, semillas, md = x$maxdepth)
+}
+
+obj_fun <- makeSingleObjectiveFunction(
+  minimize = FALSE,
+  fn = obj_fun_md,
+  par.set = makeParamSet(
+    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L)
+  ),
+  # noisy = TRUE,
+  has.simple.signature = FALSE
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 10L)
+ctrl <- setMBOControlInfill(
+  ctrl,
+  crit = makeMBOInfillCritEI(),
+  opt = "focussearch",
+  opt.focussearch.points = 2
+)
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+
+surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
+
+run_md <- mbo(obj_fun, learner = surr_km, control = ctrl)
+print(run_md)
+
+
+## ---------------------------
+## Step 10: Buscando con una Opt. Bayesiana para 2 parámetros
+## ---------------------------
+
+set.seed(semillas[1])
+obj_fun_md_ms <- function(x) {
+  experimento_rpart(dataset, semillas
+                    , md = x$maxdepth
+                    , ms = x$minsplit)
+}
+
+obj_fun <- makeSingleObjectiveFunction(
+  minimize = FALSE,
+  fn = obj_fun_md_ms,
+  par.set = makeParamSet(
+    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L),
+    makeIntegerParam("minsplit",  lower = 1L, upper = 200L)
+    # makeNumericParam <- para parámetros continuos
+  ),
+  # noisy = TRUE,
+  has.simple.signature = FALSE
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 16L)
+ctrl <- setMBOControlInfill(
+  ctrl,
+  crit = makeMBOInfillCritEI(),
+  opt = "focussearch",
+  # sacar parámetro opt.focussearch.points en próximas ejecuciones
+  opt.focussearch.points = 20
+)
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+
+surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
+
+run_md_ms <- mbo(obj_fun, learner = surr_km, control = ctrl, )
+print(run_md_ms)
+
+
+## Step 11: Buscando con una Opt. Bayesiana para 3 parámetros
+## ---------------------------
+
+set.seed(semillas[1])
+obj_fun_md_ms_mb <- function(x) {
+  experimento_rpart(dataset, semillas
+                    , md = x$maxdepth
+                    , ms = x$minsplit
+                    , mb = floor(x$minbucket * x$minsplit) )
+}
+
+obj_fun <- makeSingleObjectiveFunction(
+  minimize = FALSE,
+  fn = obj_fun_md_ms_mb,
+  par.set = makeParamSet(
+    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L),
+    makeIntegerParam("minsplit",  lower = 1L, upper = 200L),
+    makeNumericParam("minbucket", lower = 0, upper = 1)
+    
+    # makeNumericParam <- para parámetros continuos
+  ),
+  noisy = TRUE,
+  has.simple.signature = FALSE
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 30L) #Aumentó a 30 porque sí, para aumentar el espacio de búsqueda. Luego veremos cómo hacerlo
+ctrl <- setMBOControlInfill(
+  ctrl,
+  crit = makeMBOInfillCritEI(),
+  opt = "focussearch",
+  # sacar parámetro opt.focussearch.points en próximas ejecuciones
+  opt.focussearch.points = 20
+)
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+
+surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
+
+run_md_ms_mbs <- mbo(obj_fun, learner = surr_km, control = ctrl, )
+print(run_md_ms_mbs)
+
+
+##########################################################################################
+# Ahora hacer lo mismo pero con todo el dataset: Hay que modificar:
+
+# Una función auxiliar para los experimentos
+experimento_rpart2 <- function(ds, semillas, cp = -1, ms = 20, mb = 1, md = 10) {
+  gan <- c()
+  for (s in semillas) {
+    set.seed(s)
+    in_training <- caret::createDataPartition(ds$clase_binaria, p = 0.70,
+                                              list = FALSE)
+    train  <-  ds[in_training, ]
+    test   <-  ds[-in_training, ]
+    #train_sample <- tomar_muestra(train)
+    r <- modelo_rpart2(train, test, 
+                       cp = cp, ms = ms, mb = mb, md = md)
+    gan <- c(gan, r)
+  }
+  mean(gan)
+}
+
+# Armamos una función para modelar con el fin de simplificar el código futuro
+modelo_rpart2 <- function(train, test, cp =  0, ms = 20, mb = 1, md = 10) {
+  modelo <- rpart(clase_binaria ~ ., data = train,
+                  xval = 0,
+                  cp = cp,
+                  minsplit = ms,
+                  minbucket = mb,
+                  maxdepth = md)
+  
+  test_prediccion <- predict(modelo, test, type = "prob")
+  ganancia(test_prediccion[, "evento"], test$clase_binaria) / 0.3
+}
+
+############################################################
+
+#Ahora corremos 11 cambiado con ganancia
+
+set.seed(semillas[1])
+obj_fun_md_ms_mb <- function(x) {
+  experimento_rpart2(dataset, semillas
+                     , md = x$maxdepth
+                     , ms = x$minsplit
+                     , mb = floor(x$minbucket * x$minsp) )
+}
+
+obj_fun <- makeSingleObjectiveFunction(
+  minimize = FALSE,
+  fn = obj_fun_md_ms,
+  par.set = makeParamSet(
+    makeIntegerParam("maxdepth",  lower = 4L, upper = 20L),
+    makeIntegerParam("minsplit",  lower = 1L, upper = 200L),
+    makeNumericParam("minbucket", lower = 0, upper = 1)
+    
+    # makeNumericParam <- para parámetros continuos
+  ),
+  noisy = TRUE,
+  has.simple.signature = FALSE
+)
+
+ctrl <- makeMBOControl()
+ctrl <- setMBOControlTermination(ctrl, iters = 30L) #Aumentó a 30 porque sí, para aumentar el espacio de búsqueda. Luego veremos cómo hacerlo
+ctrl <- setMBOControlInfill(
+  ctrl,
+  crit = makeMBOInfillCritEI(),
+  opt = "focussearch",
+  # sacar parámetro opt.focussearch.points en próximas ejecuciones
+  opt.focussearch.points = 20
+)
+
+lrn <- makeMBOLearner(ctrl, obj_fun)
+
+surr_km <- makeLearner("regr.km", predict.type = "se", covtype = "matern3_2")
+
+run_md_ms <- mbo(obj_fun, learner = surr_km, control = ctrl, )
+print(run_md_ms)
+
+## Agregue todos los parámetros que considere. Una vez que tenga sus mejores
+## parámetros, haga una copia del script rpart/z101_PrimerModelo.R, cambie los
+## parámetros dentro del script, ejecutelo y suba a Kaggle su modelo.
+
+# Limpiamos el entorno
+rm(list = ls())
+gc(verbose = FALSE)
+
+semillas <- c(100057, 300007, 500009, 600011, 700001)
+set.seed(semillas[1])
+
+require("data.table")
+require("rpart")
+require("rpart.plot")
+setwd("C:\\dmef")
+dataset  <- fread("./datasets/competencia1_2022.csv") #cargo el dataset
+dtrain  <- dataset[ foto_mes==202101 ]  #defino donde voy a entrenar
+dapply  <- dataset[ foto_mes==202103 ]  #defino donde voy a aplicar el modelo
+
+#genero el modelo,  aqui se construye el arbol
+modelo  <- rpart(formula=   "clase_ternaria ~ .",  #quiero predecir clase_ternaria a partir de el resto de las variables
+                 data=      dtrain,  #los datos donde voy a entrenar
+                 xval=      0,
+                 cp=       -1,   #esto significa no limitar la complejidad de los splits
+                 minsplit=  103,     #minima cantidad de registros para que se haga el split
+                 minbucket= 0.0184,     #tamaño minimo de una hoja
+                 maxdepth=  7 )    #profundidad maxima del arbol
+
+
+#grafico el arbol
+prp(modelo, extra=101, digits=5, branch=1, type=4, varlen=0, faclen=0)
+
+
+#aplico el modelo a los datos nuevos
+prediccion  <- predict( object= modelo,
+                        newdata= dapply,
+                        type = "prob")
+
+#prediccion es una matriz con TRES columnas, llamadas "BAJA+1", "BAJA+2"  y "CONTINUA"
+#cada columna es el vector de probabilidades 
+
+#agrego a dapply una columna nueva que es la probabilidad de BAJA+2
+dapply[ , prob_baja2 := prediccion[, "BAJA+2"] ]
+
+#solo le envio estimulo a los registros con probabilidad de BAJA+2 mayor  a  1/40
+dapply[ , Predicted := as.numeric( prob_baja2 > 1/40 ) ]
+
+fwrite( dapply[ , list(numero_de_cliente, Predicted) ], #solo los campos para Kaggle
+        file= "./exp/KA2001/K101_001_220910_1555.csv",
+        sep=  "," )
+
+#################################################################################
+#################################################################################
+#################################################################################
+### CANARITOS by Paul
+
+#limpio la memoria
+rm( list=ls() )  #remove all objects
+gc()             #garbage collection
+
+require("data.table")
+require("rpart")
+require("rpart.plot")
+
+setwd("/dmef" )  #establezco la carpeta donde voy a trabajar
+#cargo el dataset
+dataset  <- fread( "./datasets/competencia1_2022.csv")
+
+# Creamos una clase binaria
+dataset[, clase_binaria := ifelse(
+  (clase_ternaria == "BAJA+2"|clase_ternaria == "BAJA+1"),
+  "evento",
+  "noevento"
+)]
+
+# Borramos el target viejo
+dataset[, clase_ternaria := NULL]
+
+
+#uso esta semilla para los canaritos
+set.seed(102191)
+
+#agrego 30 canaritos
+for( i in 1:30 ) dataset[ , paste0("canarito", i ) :=  runif( nrow(dataset)) ]
+
+dtrain <- dataset[ foto_mes==202101 ]
+dapply <- dataset[ foto_mes==202103 ]
+
+
+
+#Primero  veo como quedan mis arboles
+modelo_original <- rpart(
+  formula= "clase_binaria ~ .",
+  data= dtrain,
+  model= TRUE,
+  xval= 0,
+  cp= -1,
+  minsplit= 2, # dejo que crezca y corte todo lo que quiera
+  minbucket= 1,
+  maxdepth= 30 )
+
+#hago el pruning de los canaritos
+#haciendo un hackeo a la estructura  modelo_original$frame
+# -666 es un valor arbritrariamente negativo que jamas es generado por rpart
+modelo_original$frame[ modelo_original$frame$var %like% "canarito", "complexity"] <- -666
+modelo_pruned  <- prune(  modelo_original, -666 )
+
+prediccion  <- predict( modelo_pruned, dapply, type = "prob")[,"evento"]
+
+entrega  <-  as.data.table( list( "numero_de_cliente"= dapply$numero_de_cliente,
+                                  "Predicted"= as.integer(  prediccion > 0.025 ) ) )
+
+
+fwrite( entrega, paste0( "./exp/KA_Canaritos/stopping_at_canaritos_01.csv"), sep="," )
+
+pdf(file = "./work/stopping_at_canaritos.pdf", width=28, height=4)
+prp(modelo_pruned, extra=101, digits=5, branch=1, type=4, varlen=0, faclen=0, tweak=0.8, cex=0.3)
+dev.off()
 

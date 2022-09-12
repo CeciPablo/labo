@@ -41,9 +41,13 @@ prediccion  <- predict( modelo_pruned, dapply, type = "prob")[,"BAJA+2"]
 entrega  <-  as.data.table( list( "numero_de_cliente"= dapply$numero_de_cliente,
                                   "Predicted"= as.integer(  prediccion > 0.025 ) ) )
 
-fwrite( entrega, paste0( "./kaggle/stopping_at_canaritos.csv"), sep="," )
 
-pdf(file = "./work/stopping_at_canaritos.pdf", width=28, height=4)
+fwrite( entrega, paste0( "./exp/KA_Canaritos/stopping_at_canaritos_Tomas.csv"), sep="," )
+
+pdf(file = "./exp/KA_Canaritos/stopping_at_canaritos.pdf", width=28, height=4)
 prp(modelo_pruned, extra=101, digits=5, branch=1, type=4, varlen=0, faclen=0)
 dev.off()
 
+#as.data.frame(modelo_pruned$variable.importance)
+#rownames(head(as.data.frame(modelo_pruned$variable.importance),n=20))
+#paste(rownames(head(as.data.frame(modelo_pruned$variable.importance),n=20)),collapse = " + ")
