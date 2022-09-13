@@ -47,12 +47,12 @@ require("randomForest")
 require("lightgbm")
 
 # Poner la carpeta de la materia de SU computadora local
-setwd("/home/aleb/dmeyf2022")
+setwd("/dmef")
 # Poner sus semillas
-semillas <- c(17, 19, 23, 29, 31)
+semillas <- c(100057, 300007, 500009, 600011, 700001)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 enero <- dataset[foto_mes == 202101]
 marzo <- dataset[foto_mes == 202103]
 
@@ -89,6 +89,12 @@ modelo_rf_1 <- ranger(clase_binaria1 ~ ., data = dtrain,
 t1 <- Sys.time()
 as.numeric(t1 - t0, units = "secs")
 
+
+# Para random forest el parámetro más importante es la cantidad de variables.
+# la cantidad de árboles es importante pero no tanto como la cantidad de variables.
+# suele ser robusto a las variables basura... no las va a seleccionar y priorizará las variables
+# de calidad por más pequeña que sea la tomará
+
 ## ---------------------------
 ## Step 3: Midiendo el primero RF
 ## ---------------------------
@@ -105,6 +111,12 @@ print(sum((pred_test$predictions[, "evento"] >= 0.025) * ifelse(
                     dtest$clase_binaria1 == "evento",
                     78000, -2000) / 0.3))
 
+# Ganancia en dtrain: 53408571
+# Ganancia en dtest: 19873333
+  
+#!!!!!!!!!!!!!!! LA GANANCIA NUNCA MIRARLA EN TRAIN!!!!! PORQUE TE LLEVA A OVERFITEAR!!!!!
+# esto no pasaba en el árbol rpart
+
 ## Preguntas
 ## - ¿Qué paso en `train`?
 ## - ¿Se veía esa diferencia en los árboles?
@@ -118,6 +130,12 @@ importancia <- as.data.table(modelo_rf_1$variable.importance,
 colnames(importancia) <- c("variable", "importancia")
 setorder(importancia, -importancia)
 importancia
+
+#Cambió la importancia de variables!!!! Hay que confiar más en estas que en las del rpart!!!!!
+
+#Cuantas más variables acreciento como parámetro, más variables aparecerán con importancia CERO
+
+
 
 ## Preguntas
 ## - ¿Qué significa que una variable sea más importante que otra?
@@ -150,9 +168,15 @@ which(importancia2$variable == "pollito")
 
 ## Active learning o a llorar a la iglesia.
 
+#####PORQUÉ POLLITO APARECE PRIMERO en la importancia?????!!!!!!!!
+#########Indudablemente hay un overfitting..... pero por qué?
+######## No hay una explicación matemática.
+
 ## ---------------------------
 ## Step 5.1: Hablando de los Extra Trees
 ## ---------------------------
+
+#Vamos a tirarle más ruido además de los pollitos a ver qué pasa
 
 modelo_rf_3 <- ranger(clase_binaria1 ~ ., data = dtrain,
                   probability = TRUE,
@@ -196,7 +220,7 @@ which(importancia3$variable == "pollito")
 ## ---------------------------
 
 # Cargamos todo para tener un código limpio
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 enero <- dataset[foto_mes == 202101]
 marzo <- dataset[foto_mes == 202103]
 rm(dataset)
