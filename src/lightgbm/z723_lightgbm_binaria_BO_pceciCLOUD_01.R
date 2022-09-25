@@ -43,7 +43,7 @@ hs <- makeParamSet(
 #         makeIntegerParam("num_leaves",       lower=   16L   , upper=  1024L),
          makeIntegerParam("max_depth",     lower= 3L   , upper= 25L), #PC_Lo agrego como hiperparámetro
          makeIntegerParam("envios",           lower= 5000L   , upper= 15000L),
-         makeIntegerParam("max_bin",          lower=    2L   , upper=   31L) #PC_Los Agrego para optimizar
+#         makeIntegerParam("max_bin",          lower=    2L   , upper=   31L) #PC_Los Agrego para optimizar ==> GUSTAVO me dijo que en esta instancia, no!
 
         )
 
@@ -136,11 +136,11 @@ EstimarGanancia_lightgbm  <- function( x )
                           feature_pre_filter= FALSE,
                           verbosity= -100,
 #                          max_depth=  -1,         # -1 significa no limitar,  por ahora lo dejo fijo
-                          num_leaves=  pmin(  2^(x$max_depth),  131081 ),  #PC_lo agrego para optimizar según indica documentación con fix de Gustavo: limito el num_leaves a lo que soporta  lightgbm
+                          num_leaves=  pmin(  2^(x$max_depth),  131072 ),  #PC_lo agrego para optimizar según indica documentación con fix de Gustavo: limito el num_leaves a lo que soporta  lightgbm
 #                          min_gain_to_split= 0.0, #por ahora, lo dejo fijo
 #                          lambda_l1= 0.0,         #por ahora, lo dejo fijo
 #                          lambda_l2= 0.0,         #por ahora, lo dejo fijo
-#                          max_bin= 31,            #por ahora, lo dejo fijo
+                          max_bin= 31,            #por ahora, lo dejo fijo
                           num_iterations= 9999,   #un numero muy grande, lo limita early_stopping_rounds
                           force_row_wise= TRUE,   #para que los alumnos no se atemoricen con tantos warning
                           seed= PARAM$hyperparametertuning$semilla_azar
