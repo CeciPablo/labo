@@ -54,7 +54,8 @@ PARAM  <- list()
 PARAM$experimento  <- "HT7231_B"
 
 #PARAM$input$dataset       <- "./datasets/competencia2_2022.csv.gz"
-PARAM$input$dataset       <- "./exp/FE7110/dataset_7110.csv.gz"
+#PARAM$input$dataset       <- "./exp/FE7110/dataset_7110.csv.gz" #PC_Para trabajar local
+PARAM$input$dataset       <- "./datasets/dataset_7110.csv.gz" #PC_Para trabajar Cloud
 
 PARAM$input$training      <- c( 202103 )
 
@@ -200,8 +201,8 @@ EstimarGanancia_lightgbm  <- function( x )
 #Aqui empieza el programa
 
 #Aqui se debe poner la carpeta de la computadora local
-#setwd("~/buckets/b1/")   #Establezco el Working Directory
-setwd("/dmef")
+setwd("~/buckets/b1/")   #Establezco el Working Directory
+#setwd("/dmef") #PC_Para corrida local
 
 #cargo el dataset donde voy a entrenar el modelo
 dataset  <- fread( PARAM$input$dataset )
