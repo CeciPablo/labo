@@ -16,6 +16,7 @@ require("data.table")
 require("rpart")
 require("ggplot2")
 require("lightgbm")
+install.packages("xgboost")
 require("xgboost")
 
 # Poner la carpeta de la materia de SU computadora local
@@ -26,7 +27,7 @@ setwd("/dmef")
 semillas <- c(100057, 300007, 500009, 600011, 700001)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/competencia2_2022.csv.gz")
+dataset <- fread("./datasets/competencia2_2022.csv")
 marzo <- dataset[foto_mes == 202103]
 mayo <- dataset[foto_mes == 202105]
 rm(dataset)
@@ -40,6 +41,8 @@ mayo$clase_ternaria <- NULL
 ## ---------------------------
 ## Step 2: XGBoost, un modelo simple ...
 ## ---------------------------
+
+
 
 dtrain <- xgb.DMatrix(
         data = data.matrix(marzo),
@@ -66,6 +69,9 @@ colnames(new_features)[150:173]
 ## ---------------------------
 ## Step 4: Entendiendo como se construyen.
 ## ---------------------------
+
+install.packages("DiagrammeR")
+require("DiagrammeR")
 
 xgb.plot.tree(colnames(new_features), xgb_model, trees = 0)
 
