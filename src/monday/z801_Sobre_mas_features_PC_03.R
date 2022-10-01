@@ -28,7 +28,7 @@ semillas <- c(100057, 300007, 500009, 600011, 700001)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 #dataset <- fread("./datasets/dataset_7110_02.csv.gz")
-dataset <- fread("./exp/FE7110/dataset_7110_02.csv.gz")
+dataset <- fread("./exp/FE7110/dataset_7110_03.csv.gz")
 
 sum(is.na(dataset))
 
@@ -128,8 +128,13 @@ final_dataset <- as.data.table(as.matrix(new_features2))
 final_dataset[,clase_ternaria := clase_real]
 
 #grabo el dataset
+
+dir.create( "./exp/FE7110/", showWarnings = FALSE )
+
+setwd("./exp/FE7110/")   #Establezco el Working Directory DEL EXPERIMENTO
+
 fwrite( final_dataset,
-        "dataset_801_00.csv.gz",
+        "dataset_801_01.csv.gz",
         logical01= TRUE,
         sep= "," )
 

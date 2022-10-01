@@ -61,27 +61,27 @@ dataset[ , mv_status07       := ifelse( is.na(Master_status),
 
 
 #combino MasterCard y Visa
-dataset[ , mv_mfinanciacion_limite := rowSums( cbind( Master_mfinanciacion_limite,  Visa_mfinanciacion_limite) , na.rm=TRUE ) ]
+#dataset[ , mv_mfinanciacion_limite := rowSums( cbind( Master_mfinanciacion_limite,  Visa_mfinanciacion_limite) , na.rm=TRUE ) ] #quito por datadrifting
 
-dataset[ , mv_Fvencimiento         := pmin( Master_Fvencimiento, Visa_Fvencimiento, na.rm = TRUE) ]
-dataset[ , mv_Finiciomora          := pmin( Master_Finiciomora, Visa_Finiciomora, na.rm = TRUE) ]
+#dataset[ , mv_Fvencimiento         := pmin( Master_Fvencimiento, Visa_Fvencimiento, na.rm = TRUE) ] #quito por datadrifting
+#dataset[ , mv_Finiciomora          := pmin( Master_Finiciomora, Visa_Finiciomora, na.rm = TRUE) ] #quito por datadrifting
 dataset[ , mv_msaldototal          := rowSums( cbind( Master_msaldototal,  Visa_msaldototal) , na.rm=TRUE ) ]
 dataset[ , mv_msaldopesos          := rowSums( cbind( Master_msaldopesos,  Visa_msaldopesos) , na.rm=TRUE ) ]
-dataset[ , mv_msaldodolares        := rowSums( cbind( Master_msaldodolares,  Visa_msaldodolares) , na.rm=TRUE ) ]
+#dataset[ , mv_msaldodolares        := rowSums( cbind( Master_msaldodolares,  Visa_msaldodolares) , na.rm=TRUE ) ] #quito por datadrifting
 dataset[ , mv_mconsumospesos       := rowSums( cbind( Master_mconsumospesos,  Visa_mconsumospesos) , na.rm=TRUE ) ]
 dataset[ , mv_mconsumosdolares     := rowSums( cbind( Master_mconsumosdolares,  Visa_mconsumosdolares) , na.rm=TRUE ) ]
 dataset[ , mv_mlimitecompra        := rowSums( cbind( Master_mlimitecompra,  Visa_mlimitecompra) , na.rm=TRUE ) ]
 dataset[ , mv_madelantopesos       := rowSums( cbind( Master_madelantopesos,  Visa_madelantopesos) , na.rm=TRUE ) ]
-dataset[ , mv_madelantodolares     := rowSums( cbind( Master_madelantodolares,  Visa_madelantodolares) , na.rm=TRUE ) ]
-dataset[ , mv_fultimo_cierre       := pmax( Master_fultimo_cierre, Visa_fultimo_cierre, na.rm = TRUE) ]
+#dataset[ , mv_madelantodolares     := rowSums( cbind( Master_madelantodolares,  Visa_madelantodolares) , na.rm=TRUE ) ] #quito por datadrifitng
+#dataset[ , mv_fultimo_cierre       := pmax( Master_fultimo_cierre, Visa_fultimo_cierre, na.rm = TRUE) ] #quito por datadrifting
 dataset[ , mv_mpagado              := rowSums( cbind( Master_mpagado,  Visa_mpagado) , na.rm=TRUE ) ]
 dataset[ , mv_mpagospesos          := rowSums( cbind( Master_mpagospesos,  Visa_mpagospesos) , na.rm=TRUE ) ]
-dataset[ , mv_mpagosdolares        := rowSums( cbind( Master_mpagosdolares,  Visa_mpagosdolares) , na.rm=TRUE ) ]
+#dataset[ , mv_mpagosdolares        := rowSums( cbind( Master_mpagosdolares,  Visa_mpagosdolares) , na.rm=TRUE ) ] # quito por datadrifting
 dataset[ , mv_fechaalta            := pmax( Master_fechaalta, Visa_fechaalta, na.rm = TRUE) ]
 dataset[ , mv_mconsumototal        := rowSums( cbind( Master_mconsumototal,  Visa_mconsumototal) , na.rm=TRUE ) ]
 dataset[ , mv_cconsumos            := rowSums( cbind( Master_cconsumos,  Visa_cconsumos) , na.rm=TRUE ) ]
 dataset[ , mv_cadelantosefectivo   := rowSums( cbind( Master_cadelantosefectivo,  Visa_cadelantosefectivo) , na.rm=TRUE ) ]
-dataset[ , mv_mpagominimo          := rowSums( cbind( Master_mpagominimo,  Visa_mpagominimo) , na.rm=TRUE ) ]
+#dataset[ , mv_mpagominimo          := rowSums( cbind( Master_mpagominimo,  Visa_mpagominimo) , na.rm=TRUE ) ] #quito por datadrifting
 
 #a partir de aqui juego con la suma de Mastercard y Visa
 dataset[ , mvr_Master_mlimitecompra:= Master_mlimitecompra / mv_mlimitecompra ]
@@ -89,37 +89,51 @@ dataset[ , mvr_Visa_mlimitecompra  := Visa_mlimitecompra / mv_mlimitecompra ]
 dataset[ , mvr_msaldototal         := mv_msaldototal / mv_mlimitecompra ]
 dataset[ , mvr_msaldopesos         := mv_msaldopesos / mv_mlimitecompra ]
 dataset[ , mvr_msaldopesos2        := mv_msaldopesos / mv_msaldototal ]
-dataset[ , mvr_msaldodolares       := mv_msaldodolares / mv_mlimitecompra ]
-dataset[ , mvr_msaldodolares2      := mv_msaldodolares / mv_msaldototal ]
+#dataset[ , mvr_msaldodolares       := mv_msaldodolares / mv_mlimitecompra ] #quito por datadrifting
+#dataset[ , mvr_msaldodolares2      := mv_msaldodolares / mv_msaldototal ] #quito por datadrifting
 dataset[ , mvr_mconsumospesos      := mv_mconsumospesos / mv_mlimitecompra ]
 dataset[ , mvr_mconsumosdolares    := mv_mconsumosdolares / mv_mlimitecompra ]
 dataset[ , mvr_madelantopesos      := mv_madelantopesos / mv_mlimitecompra ]
-dataset[ , mvr_madelantodolares    := mv_madelantodolares / mv_mlimitecompra ]
+#dataset[ , mvr_madelantodolares    := mv_madelantodolares / mv_mlimitecompra ] #quito por datadrifting
 dataset[ , mvr_mpagado             := mv_mpagado / mv_mlimitecompra ]
 dataset[ , mvr_mpagospesos         := mv_mpagospesos / mv_mlimitecompra ]
-dataset[ , mvr_mpagosdolares       := mv_mpagosdolares / mv_mlimitecompra ]
+#dataset[ , mvr_mpagosdolares       := mv_mpagosdolares / mv_mlimitecompra ] #quito por datadrifting
 dataset[ , mvr_mconsumototal       := mv_mconsumototal  / mv_mlimitecompra ]
-dataset[ , mvr_mpagominimo         := mv_mpagominimo  / mv_mlimitecompra ]
+#dataset[ , mvr_mpagominimo         := mv_mpagominimo  / mv_mlimitecompra ] #quito por datadrifting
 
 #Aqui debe usted agregar sus propias nuevas variables
 
     # Quito variables según análisis datadrifting Marz - May
-mcuentas_saldo
-mcuenta_corriente
-mvr_msaldopesos
-mv_mpagominimo
-mv_Fvencimiento
-mv_mfinanciacion_limite
-mvr_msaldototal
-mvr_mpagosdolares
+dataset[, c(
+  "mcuentas_saldo",
+  "mcuenta_corriente",
+  "mv_mpagominimo",
+  "mv_Fvencimiento",
+  "mv_mfinanciacion_limite",
+  "ccajas_otras",
+  "mvr_mpagosdolares",
+  "Visa_mpagosdolares",
+  "mv_msaldodolares",
+  "mcuenta_debitos_automaticos",
+  "mforex_sell",
+  "Master_mfinanciacion_limite",
+  "Master_Finiciomora",
+  "Master_fultimo_cierre",
+  "Visa_Finiciomora",
+  "Visa_madelantodolares",
+  "Visa_fultimo_cierre",
+  "mv_Finiciomora",
+  "mv_madelantodolares",
+  "mv_fultimo_cierre",          
+            ):=NULL]
 
 
     #Agrego arma secreta
-dataset[ , campo1 := as.integer( ctrx_quarter <14 & mcuentas_saldo < -1256.1 & cprestamos_personales <2 ) ]
-dataset[ , campo2 := as.integer( ctrx_quarter <14 & mcuentas_saldo < -1256.1 & cprestamos_personales>=2 ) ]
+#dataset[ , campo1 := as.integer( ctrx_quarter <14 & mcuentas_saldo < -1256.1 & cprestamos_personales <2 ) ] #Descartada por datadrifting
+#dataset[ , campo2 := as.integer( ctrx_quarter <14 & mcuentas_saldo < -1256.1 & cprestamos_personales>=2 ) ] #Descartada por datadrifting
 
-dataset[ , campo3 := as.integer( ctrx_quarter <14 & mcuentas_saldo>= -1256.1 & mcaja_ahorro <2601.1 ) ]
-dataset[ , campo4 := as.integer( ctrx_quarter <14 & mcuentas_saldo>= -1256.1 & mcaja_ahorro>=2601.1 ) ]
+#dataset[ , campo3 := as.integer( ctrx_quarter <14 & mcuentas_saldo>= -1256.1 & mcaja_ahorro <2601.1 ) ] #Descartada por datadrifting
+#dataset[ , campo4 := as.integer( ctrx_quarter <14 & mcuentas_saldo>= -1256.1 & mcaja_ahorro>=2601.1 ) ] #Descartada por datadrifting
 
 dataset[ , campo5 := as.integer( ctrx_quarter>=14 & ( Visa_status>=8 | is.na(Visa_status) ) & ( Master_status>=8 | is.na(Master_status) ) ) ]
 dataset[ , campo6 := as.integer( ctrx_quarter>=14 & ( Visa_status>=8 | is.na(Visa_status) ) & ( Master_status <8 & !is.na(Master_status) ) ) ]
@@ -130,7 +144,7 @@ dataset[ , campo8 := as.integer( ctrx_quarter>=14 & Visa_status <8 & !is.na(Visa
     #Agregando Predicados
 #dataset[ , campo9 := msaldo_caja_ahorro > 0 ] #este campo no existe en el dataset
 dataset[ , campo10 := mpayroll / ( cliente_edad ^2 ) ]
-dataset[ , campo11 := 1/2 * sqrt ( mcaja_ahorro^2 + mcuenta_corriente^2 )]
+#dataset[ , campo11 := 1/2 * sqrt ( mcaja_ahorro^2 + mcuenta_corriente^2 )] #quitada por datadrifting
 dataset[ , campo12 := ( cliente_edad < 30 & mpayroll > 400000 ) ]
 #dataset[ , campo13 := ctrx_quarter <14 & Visa_mconsumo < 5000 & Master_mconsumo < 5000 & mcaja_ahorro < 10000 ] # este campo no existe en el dataset
 
@@ -165,6 +179,6 @@ if( nans_qty > 0 )
 #--------------------------------------
 #grabo el dataset
 fwrite( dataset,
-        "dataset_7110_02.csv.gz",
+        "dataset_7110_03.csv.gz",
         logical01= TRUE,
         sep= "," )
