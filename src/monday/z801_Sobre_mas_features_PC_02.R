@@ -24,24 +24,27 @@ require("xgboost")
 setwd("/dmef")
 # Poner sus semillas
 #semillas <- c(17, 19, 23, 29, 31)
-semillas <- c(100057, 300007, 500009, 600011, 700001)
+#semillas <- c(100057, 300007, 500009, 600011, 700001)
+semillas <- c(100057, 300007, 500009)
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 #dataset <- fread("./datasets/dataset_7110_02.csv.gz")
 dataset <- fread("./exp/FE7110/dataset_7110_02.csv.gz")
 
-marzo <- dataset[foto_mes == 202103]
-mayo <- dataset[foto_mes == 202105]
-rm(dataset)
+sum(is.na(dataset))
+
+#marzo <- dataset[foto_mes == 202103]
+#mayo <- dataset[foto_mes == 202105]
+#rm(dataset)
 
 # Clase BAJA+1 y BAJA+2 juntas
-clase_binaria <- ifelse(marzo$clase_ternaria == "CONTINUA", 0, 1)
-#clase_binaria <- ifelse(dataset$clase_ternaria == "CONTINUA", 0, 1)
-clase_real <- marzo$clase_ternaria
-#clase_real <- dataset$clase_ternaria
-marzo$clase_ternaria <- NULL
-#dataset$clase_ternaria <- NULL
-mayo$clase_ternaria <- NULL
+#clase_binaria <- ifelse(marzo$clase_ternaria == "CONTINUA", 0, 1)
+clase_binaria <- ifelse(dataset$clase_ternaria == "CONTINUA", 0, 1)
+#clase_real <- marzo$clase_ternaria
+clase_real <- dataset$clase_ternaria
+#marzo$clase_ternaria <- NULL
+dataset$clase_ternaria <- NULL
+#mayo$clase_ternaria <- NULL
 
 ## ---------------------------
 ## Step 2: XGBoost, un modelo simple ...
@@ -50,19 +53,19 @@ mayo$clase_ternaria <- NULL
 
 
 dtrain <- xgb.DMatrix(
-        data = data.matrix(marzo), 
-#         data = data.matrix(dataset), #le cambio "marzo" por el data set propio
+#        data = data.matrix(marzo), 
+         data = data.matrix(dataset), #le cambio "marzo" por el data set propio
           label = clase_binaria, missing = NA)
 
-# Empecemos con algo muy básico
-param_fe <- list(
-            max_depth = 2,
-            eta = 0.1,
-            objective = "binary:logistic")
-nrounds <- 5
-
-xgb_model <- xgb.train(params = param_fe, data = dtrain, nrounds = nrounds)
-
+### Empecemos con algo muy básico
+##param_fe <- list(
+##            max_depth = 2,
+##            eta = 0.1,
+##            objective = "binary:logistic")
+##nrounds <- 5
+##
+##xgb_model <- xgb.train(params = param_fe, data = dtrain, nrounds = nrounds)
+##
 ## ---------------------------
 ## Step 3: XGBoost, ... para generar nuevas variables
 ## ---------------------------
@@ -118,9 +121,10 @@ param_fe2 <- list(
 xgb_model2 <- xgb.train(params = param_fe2, data = dtrain, nrounds = 1)
 
 # Veamos un paso a paso
-new_features2 <- xgb.create.features(model = xgb_model2, data.matrix(marzo))
-
-colnames(new_features2)[150:230]
+#new_features2 <- xgb.create.features(model = xgb_model2, data.matrix(marzo))
+new_features2 <- xgb.create.features(model = xgb_model2, data.matrix(dataset))
+rm(dataset)#PC lo agrego para limpiar memoria
+#colnames(new_features2)[150:230]
 
 dtrain_lgb2  <- lgb.Dataset(
             data = data.matrix(new_features2),

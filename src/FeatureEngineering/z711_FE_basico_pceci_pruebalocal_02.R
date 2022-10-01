@@ -117,11 +117,11 @@ dataset[ , campo7 := as.integer( ctrx_quarter>=14 & Visa_status <8 & !is.na(Visa
 dataset[ , campo8 := as.integer( ctrx_quarter>=14 & Visa_status <8 & !is.na(Visa_status) & ctrx_quarter>=38 ) ]
 
     #Agregando Predicados
-dataset[ , campo9 := msaldo_caja_ahorro > 0 ] 
+#dataset[ , campo9 := msaldo_caja_ahorro > 0 ] #este campo no existe en el dataset
 dataset[ , campo10 := mpayroll / ( cliente_edad ^2 ) ]
 dataset[ , campo11 := 1/2 * sqrt ( mcaja_ahorro^2 + mcuenta_corriente^2 )]
 dataset[ , campo12 := ( cliente_edad < 30 & mpayroll > 400000 ) ]
-dataset[ , campo13 := ctrx_quarter <14 & Visa_mconsumo < 5000 & Master_mconsumo < 5000 & mcaja_ahorro < 10000 ]
+#dataset[ , campo13 := ctrx_quarter <14 & Visa_mconsumo < 5000 & Master_mconsumo < 5000 & mcaja_ahorro < 10000 ] # este campo no existe en el dataset
 
 
 
@@ -132,7 +132,7 @@ infinitos_qty  <- sum( unlist( infinitos) )
 if( infinitos_qty > 0 )
 {
   cat( "ATENCION, hay", infinitos_qty, "valores infinitos en tu dataset. Seran pasados a NA\n" )
-  dataset[mapply(is.infinite, dataset)] <<- NA
+  dataset[mapply(is.infinite, dataset)] <- NA
 }
 
 
@@ -145,7 +145,7 @@ if( nans_qty > 0 )
 {
   cat( "ATENCION, hay", nans_qty, "valores NaN 0/0 en tu dataset. Seran pasados arbitrariamente a 0\n" )
   cat( "Si no te gusta la decision, modifica a gusto el programa!\n\n")
-  dataset[mapply(is.nan, dataset)] <<- 0
+  dataset[mapply(is.nan, dataset)] <- 0
 }
 
 
