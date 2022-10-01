@@ -54,8 +54,8 @@ PARAM  <- list()
 PARAM$experimento  <- "HT7231_D"
 
 #PARAM$input$dataset       <- "./datasets/competencia2_2022.csv.gz"
-#PARAM$input$dataset       <- "./exp/FE7110/dataset_801_01.csv.gz" #PC_Para trabajar local
-PARAM$input$dataset       <- "./datasets/dataset_801_01.csv.gz" #PC_Para trabajar Cloud
+PARAM$input$dataset       <- "./exp/FE7110/dataset_801_01.csv.gz" #PC_Para trabajar local
+#PARAM$input$dataset       <- "./datasets/dataset_801_01.csv.gz" #PC_Para trabajar Cloud
 
 PARAM$input$training      <- c( 202103 )
 
