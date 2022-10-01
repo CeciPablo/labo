@@ -14,7 +14,7 @@ gc(verbose = FALSE)
 # Librerías necesarias
 require("data.table")
 require("rpart")
-require("ggplot2")
+#require("ggplot2")
 require("lightgbm")
 #install.packages("xgboost")
 require("xgboost")
@@ -30,7 +30,7 @@ semillas <- c(100057, 300007, 500009, 600011, 700001)
 #dataset <- fread("./datasets/dataset_7110_02.csv.gz")
 dataset <- fread("./exp/FE7110/dataset_7110_03.csv.gz")
 
-sum(is.na(dataset))
+#sum(is.na(dataset))
 
 #marzo <- dataset[foto_mes == 202103]
 #mayo <- dataset[foto_mes == 202105]

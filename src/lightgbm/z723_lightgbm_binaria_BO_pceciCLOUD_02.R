@@ -42,7 +42,7 @@ hs <- makeParamSet(
          makeIntegerParam("min_data_in_leaf", lower=    100L   , upper=  8000L),
 #         makeIntegerParam("num_leaves",       lower=   16L   , upper=  1024L),
          makeIntegerParam("max_depth",     lower= 3L   , upper= 25L), #PC_Lo agrego como hiperparámetro
-         makeIntegerParam("envios",           lower= 7000L   , upper= 10000L),
+         makeIntegerParam("envios",           lower= 7000L   , upper= 10000L)
 #         makeIntegerParam("max_bin",          lower=    2L   , upper=   31L) #PC_Los Agrego para optimizar ==> GUSTAVO me dijo que en esta instancia, no!
 
         )
