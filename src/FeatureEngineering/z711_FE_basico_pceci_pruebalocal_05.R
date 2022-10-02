@@ -156,6 +156,8 @@ dataset[ , campo16 := (mcuenta_corriente_adicional+mcuenta_corriente+mprestamos_
 
 dataset[ , campo17 := (mcuentas_saldo+mplazo_fijo_dolares+mplazo_fijo_pesos+minversion1_pesos+minversion1_dolares+ minversion2)/ctrx_quarter^2]
 
+dataset[ , campo18 := (Master_mlimitecompra+Visa_mlimitecompra)/ctrx_quarter^2]
+
 
 #valvula de seguridad para evitar valores infinitos
 #paso los infinitos a NULOS
@@ -186,6 +188,6 @@ if( nans_qty > 0 )
 #--------------------------------------
 #grabo el dataset
 fwrite( dataset,
-        "dataset_7110_04.csv.gz",
+        "dataset_7110_05.csv.gz",
         logical01= TRUE,
         sep= "," )
