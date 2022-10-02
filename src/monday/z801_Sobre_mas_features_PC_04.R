@@ -29,7 +29,7 @@ semillas <- c(100057, 300007, 500009, 600011, 700001)
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
 #dataset <- fread("./datasets/dataset_7110_02.csv.gz")
 #dataset <- fread("./exp/FE7110/dataset_7110_03.csv.gz")
-dataset <- fread("./exp/FE7110/dataset_7110.csv.gz") #Se lo voy a correr al de Gustavo sin agregar arma secreta y datadrifting
+dataset <- fread("./exp/FE7110/dataset_7110_04.csv.gz") #Sin quitar variables por datadrifting
 #sum(is.na(dataset))
 
 #marzo <- dataset[foto_mes == 202103]
@@ -134,7 +134,7 @@ dir.create( "./exp/FE7110/", showWarnings = FALSE )
 setwd("./exp/FE7110/")   #Establezco el Working Directory DEL EXPERIMENTO
 
 fwrite( final_dataset,
-        "dataset_801_02.csv.gz",
+        "dataset_801_03.csv.gz",
         logical01= TRUE,
         sep= "," )
 
