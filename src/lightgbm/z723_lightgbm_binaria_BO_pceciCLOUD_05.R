@@ -39,7 +39,7 @@ hs <- makeParamSet(
          makeNumericParam("lambda_l1",         lower=   0.0  , upper=  100), #PC_Los Agrego para optimizar. Subido a 100 por recomendación de Gustavo
          makeNumericParam("lambda_l2",         lower=   0.0  , upper=  100), #PC_Los Agrego para optimizar. Subido a 100 por recomendación de Gustavo
 #         makeIntegerParam("min_data_in_leaf", lower=    0L   , upper=  8000L),
-         makeIntegerParam("min_data_in_leaf", lower=    100L   , upper=  8000L),
+         makeIntegerParam("min_data_in_leaf", lower=    100L   , upper=  12000L),
 #         makeIntegerParam("num_leaves",       lower=   16L   , upper=  1024L),
          makeIntegerParam("max_depth",     lower= 3L   , upper= 25L), #PC_Lo agrego como hiperparámetro
          makeIntegerParam("envios",           lower= 7000L   , upper= 12000L)
@@ -55,14 +55,14 @@ PARAM$experimento  <- "HT7231_G"
 
 #PARAM$input$dataset       <- "./datasets/competencia2_2022.csv.gz"
 #PARAM$input$dataset       <- "./exp/FE7110/dataset_801_02.csv.gz" #PC_Para trabajar local
-PARAM$input$dataset       <- "./datasets/dataset_801_03.csv.gz" #PC_Para trabajar Cloud
+PARAM$input$dataset       <- "./datasets/dataset_801_06.csv.gz" #PC_Para trabajar Cloud
 
 PARAM$input$training      <- c( 202103 )
 
 PARAM$trainingstrategy$undersampling  <-  1.0   # un undersampling de 0.1  toma solo el 10% de los CONTINUA
 PARAM$trainingstrategy$semilla_azar   <- 100057  #Aqui poner la propia semilla
 
-PARAM$hyperparametertuning$iteraciones <- 100
+PARAM$hyperparametertuning$iteraciones <- 300
 PARAM$hyperparametertuning$xval_folds  <- 5
 PARAM$hyperparametertuning$POS_ganancia  <- 78000
 PARAM$hyperparametertuning$NEG_ganancia  <- -2000

@@ -35,10 +35,11 @@ setwd("~/buckets/b1/")   #Establezco el Working Directory
 #semillas <- c(17, 19, 23, 29, 31)
 semillas <- c(100057, 300007, 500009, 600011, 700001)
 
-PARAM$experimento  <- "Z801_cloud"
+PARAM  <- list()
+PARAM$experimento <- "Z801_cloud"
 
 # Cargamos los datasets y nos quedamos solo con 202101 y 202103
-dataset <- fread("./datasets/dataset_7110_05.csv.gz")
+dataset <- fread("./datasets/dataset_7110_06.csv.gz")
 
 # Clase BAJA+1 y BAJA+2 juntas
 clase_binaria <- ifelse(dataset$clase_ternaria == "CONTINUA", 0, 1)
@@ -50,8 +51,8 @@ dataset$clase_ternaria <- NULL
 ## Step 2: XGBoost, un modelo simple ...
 ## ---------------------------
 dtrain <- xgb.DMatrix(
-         data = data.matrix(dataset),
-          label = clase_binaria, missing = NA)
+  data = data.matrix(dataset),
+  label = clase_binaria, missing = NA)
 
 ## ---------------------------
 ## Step 6: Jugando un poco más con los parámetros del XGBoost
@@ -59,13 +60,13 @@ dtrain <- xgb.DMatrix(
 
 set.seed(semillas[1])
 param_fe2 <- list(
-                colsample_bynode = 0.8,
-                learning_rate = 1,
-                max_depth = 10, # <--- IMPORTANTE CAMBIAR
-                num_parallel_tree = 33, # <--- IMPORTANTE CAMBIAR
-                subsample = 0.8,
-                objective = "binary:logistic"
-            )
+  colsample_bynode = 0.8,
+  learning_rate = 1,
+  max_depth = 7, # <--- IMPORTANTE CAMBIAR
+  num_parallel_tree = 40, # <--- IMPORTANTE CAMBIAR
+  subsample = 0.8,
+  objective = "binary:logistic"
+)
 
 xgb_model2 <- xgb.train(params = param_fe2, data = dtrain, nrounds = 1)
 
@@ -83,6 +84,8 @@ dir.create( paste0( "./exp/", PARAM$experimento, "/"), showWarnings = FALSE )
 setwd( paste0( "./exp/", PARAM$experimento, "/") )   #Establezco el Working Directory DEL EXPERIMENTO
 
 fwrite( final_dataset,
-        "dataset_801_04.csv.gz",
+        #"dataset_801_04.csv.gz", #30 árboles paralelos
+        #"dataset_801_05.csv.gz", #40 árboles paralelos
+        "dataset_801_06.csv.gz", #40 árboles paralelos - A partir del data Set de Gustavo con -1 en imputación
         logical01= TRUE,
         sep= "," )
