@@ -25,8 +25,8 @@ PARAM$dataset  <- "./datasets/competencia3_2022.csv.gz"
 
 #copio si hace falta el dataset
 
-#setwd("~/buckets/b1/")
-setwd("~/buckets/")
+setwd("~/buckets/b1/")
+
 
 #cargo el dataset
 dataset  <- fread( PARAM$dataset )   #donde entreno

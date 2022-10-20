@@ -19,9 +19,9 @@ require("lightgbm")
 
 #Parametros del script
 PARAM  <- list()
-PARAM$experimento <- "FE9250"
+PARAM$experimento <- "FE9250_00"
 
-PARAM$exp_input  <- "DR9141"
+PARAM$exp_input  <- "DR9141_00"
 
 PARAM$lag1  <- TRUE
 PARAM$lag2  <- FALSE
@@ -313,7 +313,7 @@ setwd( "~/buckets/b1/" )
 
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
-dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset.csv.gz" )
+dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_C3_00.csv.gz" )
 dataset  <- fread( dataset_input )
 
 
@@ -408,6 +408,6 @@ if( PARAM$CanaritosAsesinos )
 #------------------------------------------------------------------------------
 #grabo el dataset
 fwrite( dataset,
-        "dataset.csv.gz",
+        "dataset_C3_00.csv.gz",
         logical01= TRUE,
         sep= "," )

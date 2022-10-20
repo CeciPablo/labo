@@ -32,8 +32,7 @@ options(error = function() {
 #------------------------------------------------------------------------------
 #Aqui empieza el programa
 
-#base_dir <- "~/buckets/b1/"
-base_dir <- "~/buckets/"
+base_dir <- "~/buckets/b1/"
 
 #creo la carpeta donde va el experimento
 dir.create( paste0( base_dir, "exp/", PARAM$experimento, "/"), showWarnings = FALSE )

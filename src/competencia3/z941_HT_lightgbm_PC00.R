@@ -19,9 +19,9 @@ require("mlrMBO")
 
 #Parametros del script
 PARAM  <- list()
-PARAM$experimento <- "HT9410"
+PARAM$experimento <- "HT9410_00"
 
-PARAM$exp_input  <- "TS9310"
+PARAM$exp_input  <- "TS9310_00"
 # FIN Parametros del script
 
 
@@ -79,7 +79,8 @@ hs <- makeParamSet(
 
 
 #si usted es ambicioso, y tiene paciencia, podria subir este valor a 100
-kBO_iteraciones  <- 50  #iteraciones de la Optimizacion Bayesiana
+#kBO_iteraciones  <- 50  #iteraciones de la Optimizacion Bayesiana
+kBO_iteraciones  <- 100  #iteraciones de la Optimizacion Bayesiana
 
 #------------------------------------------------------------------------------
 #graba a un archivo los componentes de lista
@@ -309,7 +310,7 @@ setwd("~/buckets/b1/")
 
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset_training.csv.gz
-dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_training.csv.gz" )
+dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_training_00.csv.gz" )
 dataset  <- fread( dataset_input )
 
 #Verificaciones

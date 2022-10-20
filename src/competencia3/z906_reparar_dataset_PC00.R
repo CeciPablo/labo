@@ -202,8 +202,7 @@ Corregir_MachineLearning  <- function( dataset )
 #------------------------------------------------------------------------------
 #Aqui empieza el programa
 
-#setwd( "~/buckets/b1/" )
-setwd( "~/buckets/" )
+setwd( "~/buckets/b1/" )
 
 #cargo el dataset
 dataset  <- fread( PARAM$dataset )

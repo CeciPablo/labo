@@ -191,8 +191,8 @@ drift_rank_cero_fijo  <- function( campos_drift )
 #------------------------------------------------------------------------------
 #Aqui comienza el programa
 
-#setwd("~/buckets/b1")
-setwd("~/buckets")
+setwd("~/buckets/b1")
+
 
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
