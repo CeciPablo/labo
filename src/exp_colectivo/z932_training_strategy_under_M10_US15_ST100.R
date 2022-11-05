@@ -15,15 +15,15 @@ require("data.table")
 
 #Parametros del script
 PARAM  <- list()
-PARAM$experimento <- "TS9320_M08_US15_ST100"
+PARAM$experimento <- "TS9320_M10_US15_ST100"
 
 PARAM$exp_input  <- "datasets"
 
 PARAM$future       <- c( 202107 )
 
-PARAM$final_train  <- c(202008, 202009, 202010, 202011, 202012, 202101, 202102, 202103, 202104, 202105)
+PARAM$final_train  <- c(202006, 202007, 202008, 202009, 202010, 202011, 202012, 202101, 202102, 202103, 202104, 202105)
 
-PARAM$train$training     <- c(202008,202009,202010,202011,202012,202101,202102,202103)
+PARAM$train$training     <- c(202006, 202007, 202008,202009,202010,202011,202012,202101,202102,202103)
 PARAM$train$validation   <- c( 202104 )
 PARAM$train$testing      <- c( 202105 )
 
