@@ -19,6 +19,7 @@ require("lightgbm")
 
 #Parametros del script
 PARAM  <- list()
+<<<<<<< HEAD
 PARAM$experimento <- "COMPfinal/FE9250_00"
 
 PARAM$exp_input  <- "COMPfinal/DR9141_00"
@@ -27,6 +28,16 @@ PARAM$lag1  <- TRUE
 PARAM$lag2  <- TRUE
 PARAM$Tendencias  <- TRUE
 PARAM$RandomForest  <- TRUE          #No se puede poner en TRUE para la entrega oficial de la Tercera Competencia
+=======
+PARAM$experimento <- "FE9250_00"
+
+PARAM$exp_input  <- "DR9141_00"
+
+PARAM$lag1  <- TRUE
+PARAM$lag2  <- FALSE
+PARAM$Tendencias  <- TRUE
+PARAM$RandomForest  <- FALSE          #No se puede poner en TRUE para la entrega oficial de la Tercera Competencia
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 PARAM$CanaritosAsesinos  <- FALSE
 # FIN Parametros del script
 
@@ -119,8 +130,13 @@ cppFunction('NumericVector fhistC(NumericVector pcolumna, IntegerVector pdesde )
 #la tendencia es la pendiente de la recta que ajusta por cuadrados minimos
 #La funcionalidad de ratioavg es autoria de  Daiana Sparta,  UAustral  2021
 
+<<<<<<< HEAD
 TendenciaYmuchomas  <- function( dataset, cols, ventana=3, tendencia=TRUE, minimo=TRUE, maximo=TRUE, promedio=TRUE, 
                                  ratioavg=TRUE, ratiomax=TRUE)
+=======
+TendenciaYmuchomas  <- function( dataset, cols, ventana=6, tendencia=TRUE, minimo=TRUE, maximo=TRUE, promedio=TRUE, 
+                                 ratioavg=FALSE, ratiomax=FALSE)
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 {
   gc()
   #Esta es la cantidad de meses que utilizo para la historia
@@ -313,7 +329,11 @@ setwd( "~/buckets/b1/" )
 
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
+<<<<<<< HEAD
 dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_C4_00.csv.gz" )
+=======
+dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_C3_00.csv.gz" )
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 dataset  <- fread( dataset_input )
 
 
@@ -372,6 +392,7 @@ if( PARAM$Tendencias )
 {
   TendenciaYmuchomas( dataset, 
                       cols= cols_lagueables,
+<<<<<<< HEAD
                       ventana=   3,      # 3 meses de historia
                       tendencia= TRUE,
                       minimo=    TRUE,
@@ -379,6 +400,15 @@ if( PARAM$Tendencias )
                       promedio=  TRUE,
                       ratioavg=  TRUE,
                       ratiomax=  TRUE  )
+=======
+                      ventana=   6,      # 6 meses de historia
+                      tendencia= TRUE,
+                      minimo=    FALSE,
+                      maximo=    FALSE,
+                      promedio=  TRUE,
+                      ratioavg=  FALSE,
+                      ratiomax=  FALSE  )
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 }
 
 #------------------------------------------------------------------------------
@@ -408,6 +438,10 @@ if( PARAM$CanaritosAsesinos )
 #------------------------------------------------------------------------------
 #grabo el dataset
 fwrite( dataset,
+<<<<<<< HEAD
         "dataset_C4_00.csv.gz",
+=======
+        "dataset_C3_00.csv.gz",
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
         logical01= TRUE,
         sep= "," )

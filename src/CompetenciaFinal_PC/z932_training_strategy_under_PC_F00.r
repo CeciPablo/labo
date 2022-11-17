@@ -15,6 +15,7 @@ require("data.table")
 
 #Parametros del script
 PARAM  <- list()
+<<<<<<< HEAD
 PARAM$experimento <- "TS9320_M17_US100_ST100"
 
 PARAM$exp_input  <- "COMPfinal/FE9250_00"
@@ -29,6 +30,22 @@ PARAM$train$testing      <- c( 202107 )
 
 PARAM$train$sampling_total  <- 1.0  # 1.0 significa que NO se hace sampling total,  0.3 es quedarse con el 30% de TODOS los registros
 PARAM$train$undersampling_mayoritaria  <- 1.0   # 1.0 significa NO undersampling ,  0.1  es quedarse con el 10% de los CONTINUA
+=======
+PARAM$experimento <- "TS9320"
+
+PARAM$exp_input  <- "FE9250"
+
+PARAM$future       <- c( 202107 )
+
+PARAM$final_train  <- c( 202103, 202104, 202105 )
+
+PARAM$train$training     <- c( 202101, 202102, 202103 )
+PARAM$train$validation   <- c( 202104 )
+PARAM$train$testing      <- c( 202105 )
+
+PARAM$train$sampling_total  <- 1.0  # 1.0 significa que NO se hace sampling total,  0.3 es quedarse con el 30% de TODOS los registros
+PARAM$train$undersampling_mayoritaria  <- 0.1   # 1.0 significa NO undersampling ,  0.1  es quedarse con el 10% de los CONTINUA
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 
 #Atencion, las semillas deben ser distintas
 PARAM$train$semilla_sampling  <- 102191
@@ -52,13 +69,22 @@ setwd( "~/buckets/b1/" )
 
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
+<<<<<<< HEAD
 dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_C4_00.csv.gz" )
+=======
+dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset.csv.gz" )
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 dataset  <- fread( dataset_input )
 
 
 #creo la carpeta donde va el experimento
+<<<<<<< HEAD
 dir.create( paste0( "./exp/COMPfinal/", PARAM$experimento, "/"), showWarnings = FALSE )
 setwd(paste0( "./exp/COMPfinal/", PARAM$experimento, "/"))   #Establezco el Working Directory DEL EXPERIMENTO
+=======
+dir.create( paste0( "./exp/", PARAM$experimento, "/"), showWarnings = FALSE )
+setwd(paste0( "./exp/", PARAM$experimento, "/"))   #Establezco el Working Directory DEL EXPERIMENTO
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 
 
 setorder( dataset, foto_mes, numero_de_cliente )
@@ -89,8 +115,13 @@ dataset[ foto_mes %in% PARAM$train$training , azar_under := runif( nrow(dataset[
 
 dataset[  , fold_train := 0L ]
 dataset[ foto_mes %in% PARAM$train$training & 
+<<<<<<< HEAD
            ( azar_sampling <= PARAM$train$sampling_total ) &
            ( azar_under <= PARAM$train$undersampling_mayoritaria | clase_ternaria %in% c( "BAJA+1", "BAJA+2" ) )
+=======
+         ( azar_sampling <= PARAM$train$sampling_total ) &
+         ( azar_under <= PARAM$train$undersampling_mayoritaria | clase_ternaria %in% c( "BAJA+1", "BAJA+2" ) )
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
          , fold_train := 1L ]
 
 #Se valida SIN sampling de ningun tipo

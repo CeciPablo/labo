@@ -12,8 +12,13 @@ require("data.table")
 
 #Parametros del script
 PARAM  <- list()
+<<<<<<< HEAD
 PARAM$experimento  <- "COMPfinal/CA9060_00"
 PARAM$dataset  <- "./datasets/competencia4_2022.csv.gz"
+=======
+PARAM$experimento  <- "CA9060_00"
+PARAM$dataset  <- "./datasets/competencia3_2022.csv.gz"
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 
 PARAM$metodo  <- "MachineLearning"     #valores posibles  "MachineLearning"  "EstadisticaClasica"
 # FIN Parametros del script
@@ -232,6 +237,10 @@ PARAM$metodo,
 #------------------------------------------------------------------------------
 #grabo el dataset
 fwrite( dataset,
+<<<<<<< HEAD
         file=  "dataset_C4_00.csv.gz",
+=======
+        file=  "dataset_C3_00.csv.gz",
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
         logical01= TRUE,
         sep= "," )

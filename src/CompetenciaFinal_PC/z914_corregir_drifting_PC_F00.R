@@ -14,12 +14,21 @@ require("data.table")
 
 #Parametros del script
 PARAM  <- list()
+<<<<<<< HEAD
 PARAM$experimento  <- "COMPfinal/DR9141_00"
 
 PARAM$exp_input  <- "COMPfinal/CA9060_00"
 
 #valores posibles  "ninguno" "rank_simple" , "rank_cero_fijo" , "deflacion"
 PARAM$metodo  <- "rank_cero_fijo"
+=======
+PARAM$experimento  <- "DR9141_00"
+
+PARAM$exp_input  <- "CA9060_00"
+
+#valores posibles  "ninguno" "rank_simple" , "rank_cero_fijo" , "deflacion"
+PARAM$metodo  <- "deflacion"
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 # FIN Parametros del script
 
 
@@ -33,7 +42,11 @@ AgregarVariables  <- function( dataset )
   #INICIO de la seccion donde se deben hacer cambios con variables nuevas
 
   #creo un ctr_quarter que tenga en cuenta cuando los clientes hace 3 menos meses que estan
+<<<<<<< HEAD
   dataset[  , ctrx_quarter_normalizado := as.numeric(ctrx_quarter) ] #PC_13Nov: agrego as.numeric xq tiraba error
+=======
+  dataset[  , ctrx_quarter_normalizado := ctrx_quarter ]
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
   dataset[ cliente_antiguedad==1 , ctrx_quarter_normalizado := ctrx_quarter * 5 ]
   dataset[ cliente_antiguedad==2 , ctrx_quarter_normalizado := ctrx_quarter * 2 ]
   dataset[ cliente_antiguedad==3 , ctrx_quarter_normalizado := ctrx_quarter * 1.2 ]
@@ -100,6 +113,7 @@ AgregarVariables  <- function( dataset )
   dataset[ , vmr_mpagominimo         := vm_mpagominimo  / vm_mlimitecompra ]
 
   #Aqui debe usted agregar sus propias nuevas variables
+<<<<<<< HEAD
   dataset[ , campo01 := as.integer( ctrx_quarter <14 & mcuentas_saldo < -1256.1 & cprestamos_personales <2 ) ]
   dataset[ , campo02 := as.integer( ctrx_quarter <14 & mcuentas_saldo < -1256.1 & cprestamos_personales>=2 ) ]
   dataset[ , campo03 := as.integer( ctrx_quarter <14 & mcuentas_saldo>= -1256.1 & mcaja_ahorro <2601.1 ) ] 
@@ -119,6 +133,9 @@ AgregarVariables  <- function( dataset )
   dataset[ , campo17 := (mcuentas_saldo+mplazo_fijo_dolares+mplazo_fijo_pesos+minversion1_pesos+minversion1_dolares+ minversion2)/ctrx_quarter^2]
   dataset[ , campo18 := (Master_mlimitecompra+Visa_mlimitecompra)/ctrx_quarter^2]
   
+=======
+
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
   #valvula de seguridad para evitar valores infinitos
   #paso los infinitos a NULOS
   infinitos      <- lapply(names(dataset),function(.name) dataset[ , sum(is.infinite(get(.name)))])
@@ -214,7 +231,11 @@ setwd("~/buckets/b1")
 
 #cargo el dataset donde voy a entrenar
 #esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
+<<<<<<< HEAD
 dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_C4_00.csv.gz" )
+=======
+dataset_input  <- paste0( "./exp/", PARAM$exp_input, "/dataset_C3_00.csv.gz" )
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 dataset  <- fread( dataset_input )
 
 #creo la carpeta donde va el experimento
@@ -246,5 +267,9 @@ PARAM$metodo,
 
 
 fwrite( dataset,
+<<<<<<< HEAD
         file="dataset_C4_00.csv.gz",
+=======
+        file="dataset_C3_00.csv.gz",
+>>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
         sep= "," )
