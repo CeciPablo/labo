@@ -28,7 +28,7 @@ PARAM$lag1  <- TRUE
 PARAM$lag2  <- TRUE
 PARAM$Tendencias  <- TRUE
 PARAM$RandomForest  <- TRUE          #No se puede poner en TRUE para la entrega oficial de la Tercera Competencia
-=======
+
 PARAM$experimento <- "FE9250_00"
 
 PARAM$exp_input  <- "DR9141_00"
@@ -37,7 +37,6 @@ PARAM$lag1  <- TRUE
 PARAM$lag2  <- FALSE
 PARAM$Tendencias  <- TRUE
 PARAM$RandomForest  <- FALSE          #No se puede poner en TRUE para la entrega oficial de la Tercera Competencia
->>>>>>> 7d92b54291d1de4804a0e105b78075cc20531a0e
 PARAM$CanaritosAsesinos  <- FALSE
 # FIN Parametros del script
 

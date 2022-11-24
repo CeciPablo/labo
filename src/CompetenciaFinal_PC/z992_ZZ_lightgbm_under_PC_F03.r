@@ -26,9 +26,8 @@ semillas <- c(102191, 869587, 417227, 290923, 666617, 666637, 666647, 500009, 60
 
 #Parametros del script
 PARAM  <- list()
-PARAM$experimento  <- "COMPfinal/ZZ9420_M17_US040_ST100"
-PARAM$exp_input  <- "COMPfinal/HT9420_M17_US040_ST100"
-
+PARAM$experimento  <- "COMPfinal/ZZ9420_M17_US040_ST100_r3"
+PARAM$exp_input  <- "COMPfinal/HT9420_M17_US040_ST100_r3"
 
 for (q in semillas ){
   
